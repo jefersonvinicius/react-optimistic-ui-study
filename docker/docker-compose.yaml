@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  app:
+    build: 
+      context: ../
+      dockerfile: ./docker/Dockerfile
+  db:
+    image: postgres:13.0
+    ports:
+        - '5436:5432'
+    environment:
+        POSTGRES_PASSWORD: 123456
+        POSTGRES_DB: todolist
+    volumes:
+        - ./dbdata:/data/postgres
