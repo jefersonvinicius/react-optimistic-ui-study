@@ -5,7 +5,7 @@ import (
 	"todolist/template/engine"
 )
 
-// Main render main page
+// Main : render main page
 func Main(w http.ResponseWriter, r *http.Request) {
 	engine.RenderView(w, "main", nil)
 }

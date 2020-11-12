@@ -1,8 +1,15 @@
 FROM golang:1.14
 
-WORKDIR /go/src/app
-COPY . .
+ADD ./ /go/src/todolist 
 
-RUN go install
+WORKDIR /go/src/todolist
 
-CMD ["/go/bin/app"]
+RUN ls .
+
+RUN go mod download
+
+RUN go build -o todolist main.go
+
+RUN ls .
+
+CMD ["/go/src/todolist/todolist"]
