@@ -3,11 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport">
+    {{template "bootstrap" .}}
     <title>Todo List</title>
 </head>
 <body>
     <div class="container">
         <h1>Todo Golist</h1>
+        <ul>
+            {{range $task := .tasks}}
+            <li>{{$task.Label}} [ {{ $task.Completed }} ]</li>
+            {{ end }}
+        </ul>
     </div>
 </body>
 </html>

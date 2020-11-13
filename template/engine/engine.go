@@ -7,8 +7,14 @@ import (
 )
 
 var (
-	templates = template.Must(template.ParseGlob("views/*.html"))
+	templates *template.Template
 )
+
+// InitTemplateEngine init template engine
+func InitTemplateEngine() {
+	templates = template.Must(template.ParseGlob("views/*.html"))
+	template.Must(templates.ParseGlob("views/templates/*.html"))
+}
 
 // RenderView render template
 func RenderView(w http.ResponseWriter, filename string, data interface{}) {
