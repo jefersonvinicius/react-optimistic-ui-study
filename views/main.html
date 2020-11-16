@@ -9,9 +9,25 @@
 <body>
     <div class="container">
         <h1>Todo Golist</h1>
-        <ul>
+        <div>
+            <div>
+                <button type="button" class="btn btn-primary">ADICIONAR</button>
+            </div>
+        </div>
+        <div class="progress mt-2 mb-2">
+            <div class="progress-bar" role="progressbar" style="width: {{ .progress }}%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                {{.progress}}%
+            </div>
+        </div>
+        <ul class="list-group">
             {{range $task := .tasks}}
-            <li>{{$task.Label}} [ {{ $task.Completed }} ]</li>
+                {{ $disabled := "" }}
+                {{ if $task.Completed }}
+                {{   $disabled = "disabled" }}
+                {{ end }}
+                <li class="list-group-item {{ $disabled }}">
+                    {{$task.Label}} [ {{ $task.Completed }} ]
+                </li>
             {{ end }}
         </ul>
     </div>
