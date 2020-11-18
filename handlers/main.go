@@ -11,7 +11,7 @@ import (
 func Main(w http.ResponseWriter, r *http.Request) {
 
 	var tasks []models.Task
-	database.Instance().Find(&tasks)
+	database.Instance().Order("created_at DESC").Find(&tasks)
 
 	var numberOfTasksCompleted int64
 	database.Instance().Model(&models.Task{}).Where("completed = ?", true).Count(&numberOfTasksCompleted)
