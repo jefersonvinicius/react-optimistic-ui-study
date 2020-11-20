@@ -4,9 +4,9 @@ import "time"
 
 // Task model
 type Task struct {
-	ID        uint `gorm:"primarykey"`
-	Label     string
-	Completed bool
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID        uint      `gorm:"primarykey" json:"id"`
+	Label     string    `json:"label"`
+	Completed bool      `json:"completed"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }

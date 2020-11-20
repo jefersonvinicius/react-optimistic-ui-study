@@ -1,14 +1,14 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 	"todolist/database"
 	"todolist/domain/models"
-	"todolist/template/engine"
 )
 
-// Main : render main page
-func Main(w http.ResponseWriter, r *http.Request) {
+// ListTasks : list tasks
+func ListTasks(w http.ResponseWriter, r *http.Request) {
 
 	var tasks []models.Task
 	database.Instance().Order("created_at DESC").Find(&tasks)
@@ -20,5 +20,8 @@ func Main(w http.ResponseWriter, r *http.Request) {
 		"tasks":    tasks,
 		"progress": float64(numberOfTasksCompleted) / float64(len(tasks)) * 100,
 	}
-	engine.RenderView(w, "main", data)
+
+	json, _ := json.Marshal(data)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(json)
 }

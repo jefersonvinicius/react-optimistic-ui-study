@@ -16,9 +16,9 @@ func GetRouter() *mux.Router {
 
 // RegisterRoutes register routes
 func RegisterRoutes() {
-	router.HandleFunc("/", handlers.Main)
-	router.HandleFunc("/create/task", handlers.CreateTask)
+	router.HandleFunc("/tasks", handlers.ListTasks).Methods("GET")
 	router.HandleFunc("/tasks", handlers.StoreTask).Methods("POST")
+
 }
 
 // SetupStaticFilesServer to serve static files
