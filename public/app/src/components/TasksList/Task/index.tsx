@@ -1,4 +1,4 @@
-import { IconButton, ListItem, Typography } from '@material-ui/core';
+import { Box, IconButton, ListItem, Typography } from '@material-ui/core';
 import React from 'react';
 import { ITask } from 'types';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -11,10 +11,15 @@ interface Props {
 export default function Task({ task }: Props) {
   return (
     <ListItem>
+      <Box flex="1">
+        <Typography>{task.label}</Typography>
+      </Box>
+      <IconButton>
+        <DeleteIcon />
+      </IconButton>
       <IconButton>
         <CheckIcon />
       </IconButton>
-      <Typography>{task.label}</Typography>
     </ListItem>
   );
 }

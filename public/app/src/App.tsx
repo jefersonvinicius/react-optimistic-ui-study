@@ -1,8 +1,9 @@
-import { LinearProgress } from '@material-ui/core';
-import TasksList from './components/TasksList';
+import { Box } from '@material-ui/core';
+import TasksList from 'components/TasksList';
 import React, { useEffect, useReducer } from 'react';
 import api from './services/api';
 import { ITask } from './types';
+import Progress from 'components/Progress';
 
 interface IReducerState {
   progress: number;
@@ -53,9 +54,9 @@ export default function App() {
   }
 
   return (
-    <div>
-      <LinearProgress variant="determinate" value={state.progress} />
+    <Box padding="20px">
+      <Progress progress={state.progress} />
       <TasksList tasks={state.tasks} onDeleteClick={handleDeleteClick} onMarkClick={handleMarkClick} />
-    </div>
+    </Box>
   );
 }
