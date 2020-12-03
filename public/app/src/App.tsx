@@ -4,36 +4,7 @@ import React, { useEffect, useReducer } from 'react';
 import api from './services/api';
 import { ITask } from './types';
 import Progress from 'components/Progress';
-
-interface IReducerState {
-  progress: number;
-  tasks: ITask[];
-}
-
-enum ActionsTypes {
-  INIT_STATE = 'INIT_STATE',
-}
-
-interface IPayloadInitState {
-  progress: number;
-  tasks: ITask[];
-}
-
-interface IReducerAction {
-  type: ActionsTypes;
-  payload: IPayloadInitState;
-}
-
-const initialState = { tasks: [], progress: 0 };
-
-function reducer(state: IReducerState, action: IReducerAction): IReducerState {
-  switch (action.type) {
-    case ActionsTypes.INIT_STATE:
-      return action.payload;
-    default:
-      return state;
-  }
-}
+import reducer, { initialState, TasksActions } from 'reducers/tasks';
 
 export default function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -41,16 +12,16 @@ export default function App() {
   useEffect(() => {
     api.get('/tasks').then((response) => {
       console.log(response);
-      dispatch({ type: ActionsTypes.INIT_STATE, payload: response.data });
+      dispatch(TasksActions.initTasks(response.data));
     });
   }, []);
 
-  function handleMarkClick(task: ITask) {
-    console.log('MARK TASK: ', task.label);
+  function handleMarkClick(_: ITask, index: number) {
+    dispatch(TasksActions.toggleTask({ taskIndex: index }));
   }
 
-  function handleDeleteClick(task: ITask) {
-    console.log('DELETE TASK: ', task.label);
+  function handleDeleteClick(task: ITask, _: number) {
+    dispatch(TasksActions.deleteTask({ taskId: task.id }));
   }
 
   return (

@@ -9,8 +9,8 @@ export default function Progress({ progress }: Props) {
   return (
     <>
       <LinearProgress variant="determinate" value={progress} />
-      <Box alignItems="center" flex="1" marginTop="5px">
-        <Typography>{progress}% Concluído</Typography>
+      <Box marginTop="5px">
+        <Typography align="center">{Math.floor(progress)}% Concluído</Typography>
       </Box>
     </>
   );
