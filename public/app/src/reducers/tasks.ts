@@ -48,6 +48,7 @@ export default function reducer(state: IReducerTasks, action: IReducerTasksActio
   switch (action.type) {
     case TasksActionsTypes.INIT_STATE:
       return action.payload as IPayloadInitTasks;
+
     case TasksActionsTypes.TOGGLE_TASK:
       const index = (action.payload as IPayloadToggleTask).taskIndex;
       const taskForToggle = state.tasks[index];
@@ -60,6 +61,7 @@ export default function reducer(state: IReducerTasks, action: IReducerTasksActio
         progress: calculateProgress(tasksToggled),
         tasks: tasksToggled,
       };
+
     case TasksActionsTypes.DELETE_TASK:
       const taskId = (action.payload as IPayloadDeleteTask).taskId;
       const tasksDeleted = state.tasks.filter((task) => task.id !== taskId);
@@ -67,6 +69,7 @@ export default function reducer(state: IReducerTasks, action: IReducerTasksActio
         progress: calculateProgress(tasksDeleted),
         tasks: tasksDeleted,
       };
+
     default:
       return state;
   }
