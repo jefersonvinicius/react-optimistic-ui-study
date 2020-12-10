@@ -1,26 +1,26 @@
-import { Box } from '@material-ui/core';
+import { Box, Button, Snackbar, Typography } from '@material-ui/core';
 import TasksList from 'components/TasksList';
 import React, { useEffect, useReducer, useRef, useState } from 'react';
 import api from './services/api';
 import { ITask } from './types';
 import Progress from 'components/Progress';
-import reducer, { initialState, TasksActions } from 'reducers/tasks';
+import tasksReducer, { initialState, TasksActions } from 'reducers/tasks';
 import DeleteConfirm from 'components/DeleteConfirm';
 
-export default function App() {
-  const [state, dispatch] = useReducer(reducer, initialState);
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [deleteConfirmModalTexts, setDeleteConfirmModalTexts] = useState({
-    title: '',
-    content: '',
-  });
+interface ITaskForDelete {
+  task: ITask;
+  index: number;
+}
 
-  const taskForDelete = useRef<ITask>();
-  const tasksDeleted = useRef<ITask[]>([]);
+export default function App() {
+  const [state, dispatch] = useReducer(tasksReducer, initialState);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+  const taskForDelete = useRef<ITaskForDelete>();
 
   useEffect(() => {
     api.get('/tasks').then((response) => {
-      console.log(response);
       dispatch(TasksActions.initTasks(response.data));
     });
   }, []);
@@ -29,8 +29,8 @@ export default function App() {
     dispatch(TasksActions.toggleTask({ taskIndex: index }));
   }
 
-  function handleDeleteClick(task: ITask, _: number) {
-    taskForDelete.current = task;
+  function handleDeleteClick(task: ITask, index: number) {
+    taskForDelete.current = { task, index };
     setDeleteConfirmOpen(true);
   }
 
@@ -38,10 +38,25 @@ export default function App() {
     if (!taskForDelete.current) {
       return;
     }
-    tasksDeleted.current.push(taskForDelete.current);
-    const taskId = taskForDelete.current.id;
+
+    const taskId = taskForDelete.current.task.id;
     dispatch(TasksActions.deleteTask({ taskId: taskId }));
     setDeleteConfirmOpen(false);
+    setSnackbarOpen(true);
+  }
+
+  function handleUndoDeleteClick() {
+    if (!taskForDelete.current) {
+      return;
+    }
+    dispatch(TasksActions.addTask({ newTask: taskForDelete.current.task, index: taskForDelete.current.index }));
+    taskForDelete.current = undefined;
+    setSnackbarOpen(false);
+  }
+
+  function handleCloseSnackbar() {
+    setSnackbarOpen(false);
+    taskForDelete.current = undefined;
   }
 
   return (
@@ -52,6 +67,18 @@ export default function App() {
         open={deleteConfirmOpen}
         onClose={() => setDeleteConfirmOpen(false)}
         onDelete={handleDeleteConfirm}
+      />
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={1000}
+        onClose={handleCloseSnackbar}
+        message="Tarefa excluída"
+        action={
+          <Button onClick={handleUndoDeleteClick} color="secondary" size="small">
+            Desfazer
+          </Button>
+        }
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       />
     </Box>
   );

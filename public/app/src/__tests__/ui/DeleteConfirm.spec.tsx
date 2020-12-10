@@ -1,25 +1,14 @@
 import React from 'react';
 import DeleteConfirm from 'components/DeleteConfirm';
-import { unmountComponentAtNode, render } from 'react-dom';
+import { render } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 
-describe('DeleteConfirm component specs', () => {
-  let container: HTMLDivElement;
-
-  beforeEach(() => {
-    container = document.createElement('div');
-    document.body.appendChild(container);
-  });
-
-  afterEach(() => {
-    unmountComponentAtNode(container);
-    container.remove();
-  });
-
-  it('should show modal with defaul text', () => {
+describe('DeleteConfirm component testes', () => {
+  it('should show modal with default content', () => {
     act(() => {
-      render(<DeleteConfirm open={true} onClose={() => {}} />, container);
-      expect(container.textContent).toBe('Tem certeza que deseja realizar essa exclusão?');
+      const { getByText } = render(<DeleteConfirm open={true} onClose={() => {}} onDelete={() => {}} />);
+      const element = getByText(/Tem certeza que deseja realizar essa exclusão?/i);
+      expect(element).toBeInTheDocument();
     });
   });
 });

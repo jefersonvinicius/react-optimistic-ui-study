@@ -1,5 +1,5 @@
 import { Divider, List } from '@material-ui/core';
-import React from 'react';
+import React, { Fragment } from 'react';
 import { ITask } from 'types';
 import Task from './Task';
 
@@ -14,16 +14,10 @@ export default function TasksList({ tasks, onMarkClick, onDeleteClick }: Props) 
     <List>
       {tasks.map((task, index) => {
         return (
-          <>
-            <Task
-              key={task.id}
-              task={task}
-              indexInList={index}
-              onMarkClick={onMarkClick}
-              onDeleteClick={onDeleteClick}
-            />
+          <Fragment key={task.id}>
+            <Task task={task} indexInList={index} onMarkClick={onMarkClick} onDeleteClick={onDeleteClick} />
             <Divider />
-          </>
+          </Fragment>
         );
       })}
     </List>
