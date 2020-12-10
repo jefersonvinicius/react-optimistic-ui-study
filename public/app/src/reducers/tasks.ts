@@ -1,7 +1,7 @@
 import { calculateProgress } from 'common/progress';
 import { ITask } from 'types';
 
-interface IReducerTasks {
+export interface IReducerTasksState {
   progress: number;
   tasks: ITask[];
 }
@@ -10,6 +10,7 @@ enum TasksActionsTypes {
   INIT_STATE = 'INIT_STATE',
   TOGGLE_TASK = 'TOGGLE_TASK',
   DELETE_TASK = 'DELETE_TASK',
+  ADD_TASK = 'ADD_TASK',
 }
 
 interface IPayloadInitTasks {
@@ -25,9 +26,14 @@ interface IPayloadDeleteTask {
   taskId: number;
 }
 
+interface IPayloadAddTask {
+  newTask: ITask;
+  index?: number;
+}
+
 interface IReducerTasksAction {
   type: TasksActionsTypes;
-  payload: IPayloadInitTasks | IPayloadToggleTask | IPayloadDeleteTask;
+  payload: IPayloadInitTasks | IPayloadToggleTask | IPayloadDeleteTask | IPayloadAddTask;
 }
 
 export const initialState = { tasks: [], progress: 0 };
@@ -42,9 +48,12 @@ export const TasksActions = {
   deleteTask: (data: IPayloadDeleteTask): IReducerTasksAction => {
     return { type: TasksActionsTypes.DELETE_TASK, payload: data };
   },
+  addTask: (data: IPayloadAddTask): IReducerTasksAction => {
+    return { type: TasksActionsTypes.ADD_TASK, payload: data };
+  },
 };
 
-export default function reducer(state: IReducerTasks, action: IReducerTasksAction): IReducerTasks {
+export default function tasksReducer(state: IReducerTasksState, action: IReducerTasksAction): IReducerTasksState {
   switch (action.type) {
     case TasksActionsTypes.INIT_STATE:
       return action.payload as IPayloadInitTasks;
@@ -70,7 +79,26 @@ export default function reducer(state: IReducerTasks, action: IReducerTasksActio
         tasks: tasksDeleted,
       };
 
+    case TasksActionsTypes.ADD_TASK:
+      const insertThisIndex = (action.payload as IPayloadAddTask).index;
+      const newTask = (action.payload as IPayloadAddTask).newTask;
+
+      let newTasks;
+      if (shouldInsertInSpecificIndex(insertThisIndex)) {
+        newTasks = [...state.tasks.slice(0, insertThisIndex), newTask, ...state.tasks.slice(insertThisIndex)];
+      } else {
+        newTasks = [...state.tasks, newTask];
+      }
+
+      return {
+        progress: calculateProgress(newTasks),
+        tasks: newTasks,
+      };
     default:
       return state;
+  }
+
+  function shouldInsertInSpecificIndex(index: number | undefined) {
+    return index !== undefined && index >= 0 && index <= state.tasks.length;
   }
 }
