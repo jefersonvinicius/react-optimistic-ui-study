@@ -136,4 +136,85 @@ describe('Testing tasks reducer', () => {
       progress: 50,
     });
   });
+
+  it('should update task that exists', () => {
+    const initialState: IReducerTasksState = {
+      tasks: [
+        { id: 2, label: 'Teste 2', createdAt: '', updatedAt: '', completed: true },
+        { id: 1, label: 'Teste', createdAt: '', updatedAt: '', completed: false },
+        { id: 3, label: 'Teste', createdAt: '', updatedAt: '', completed: true },
+      ],
+      progress: 50,
+    };
+
+    const state = tasksReducer(initialState, TasksActions.updateTask({ taskId: 1, data: { label: 'Mudou' } }));
+
+    expect(state).toMatchObject({
+      tasks: [
+        { id: 2, label: 'Teste 2', createdAt: '', updatedAt: '', completed: true },
+        { id: 1, label: 'Mudou', createdAt: '', updatedAt: '', completed: false },
+        { id: 3, label: 'Teste', createdAt: '', updatedAt: '', completed: true },
+      ],
+      progress: 50,
+    });
+  });
+
+  it('should update task that dont exists', () => {
+    const initialState: IReducerTasksState = {
+      tasks: [
+        { id: 2, label: 'Teste 2', createdAt: '', updatedAt: '', completed: true },
+        { id: 1, label: 'Teste', createdAt: '', updatedAt: '', completed: false },
+        { id: 3, label: 'Teste', createdAt: '', updatedAt: '', completed: true },
+      ],
+      progress: 50,
+    };
+
+    const state = tasksReducer(initialState, TasksActions.updateTask({ taskId: 5, data: { label: 'Mudou' } }));
+
+    expect(state).toMatchObject(initialState);
+  });
+
+  it('should update task in initial position', () => {
+    const initialState: IReducerTasksState = {
+      tasks: [
+        { id: 2, label: 'Teste 2', createdAt: '', updatedAt: '', completed: true },
+        { id: 1, label: 'Teste', createdAt: '', updatedAt: '', completed: false },
+        { id: 3, label: 'Teste', createdAt: '', updatedAt: '', completed: true },
+      ],
+      progress: 50,
+    };
+
+    const state = tasksReducer(initialState, TasksActions.updateTask({ taskId: 2, data: { label: 'Mudou' } }));
+
+    expect(state).toMatchObject({
+      tasks: [
+        { id: 2, label: 'Mudou', createdAt: '', updatedAt: '', completed: true },
+        { id: 1, label: 'Teste', createdAt: '', updatedAt: '', completed: false },
+        { id: 3, label: 'Teste', createdAt: '', updatedAt: '', completed: true },
+      ],
+      progress: 50,
+    });
+  });
+
+  it('should update task in final position', () => {
+    const initialState: IReducerTasksState = {
+      tasks: [
+        { id: 2, label: 'Teste 2', createdAt: '', updatedAt: '', completed: true },
+        { id: 1, label: 'Teste', createdAt: '', updatedAt: '', completed: false },
+        { id: 3, label: 'Teste', createdAt: '', updatedAt: '', completed: true },
+      ],
+      progress: 50,
+    };
+
+    const state = tasksReducer(initialState, TasksActions.updateTask({ taskId: 3, data: { label: 'Mudou' } }));
+
+    expect(state).toMatchObject({
+      tasks: [
+        { id: 2, label: 'Teste 2', createdAt: '', updatedAt: '', completed: true },
+        { id: 1, label: 'Teste', createdAt: '', updatedAt: '', completed: false },
+        { id: 3, label: 'Mudou', createdAt: '', updatedAt: '', completed: true },
+      ],
+      progress: 50,
+    });
+  });
 });

@@ -11,6 +11,7 @@ enum TasksActionsTypes {
   TOGGLE_TASK = 'TOGGLE_TASK',
   DELETE_TASK = 'DELETE_TASK',
   ADD_TASK = 'ADD_TASK',
+  UPDATE_TASK = 'UPDATE_TASK',
 }
 
 interface IPayloadInitTasks {
@@ -29,6 +30,15 @@ interface IPayloadDeleteTask {
 interface IPayloadAddTask {
   newTask: ITask;
   index?: number;
+}
+
+interface IUpdateData {
+  label: string;
+}
+
+interface IPayloadUpdateTask {
+  taskId: number;
+  data: IUpdateData;
 }
 
 interface IReducerTasksAction {
@@ -50,6 +60,9 @@ export const TasksActions = {
   },
   addTask: (data: IPayloadAddTask): IReducerTasksAction => {
     return { type: TasksActionsTypes.ADD_TASK, payload: data };
+  },
+  updateTask: (data: IPayloadUpdateTask): IReducerTasksAction => {
+    return { type: TasksActionsTypes.UPDATE_TASK, payload: data };
   },
 };
 
@@ -93,6 +106,26 @@ export default function tasksReducer(state: IReducerTasksState, action: IReducer
       return {
         progress: calculateProgress(newTasks),
         tasks: newTasks,
+      };
+
+    case TasksActionsTypes.UPDATE_TASK:
+      const taskIdForUpdate = (action.payload as IPayloadUpdateTask).taskId;
+      const data = (action.payload as IPayloadUpdateTask).data;
+
+      const taskIndex = state.tasks.findIndex((task) => task.id === taskIdForUpdate);
+      if (taskIndex === -1) {
+        return state;
+      }
+
+      const taskPreviousData = state.tasks[taskIndex];
+
+      return {
+        progress: state.progress,
+        tasks: [
+          ...state.tasks.slice(0, taskIndex),
+          { ...taskPreviousData, label: data.label },
+          ...state.tasks.slice(taskIndex + 1),
+        ],
       };
     default:
       return state;

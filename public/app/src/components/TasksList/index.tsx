@@ -7,15 +7,22 @@ interface Props {
   tasks: ITask[];
   onMarkClick: (task: ITask, index: number) => void;
   onDeleteClick: (task: ITask, index: number) => void;
+  onUpdateTask: (task: ITask, newLabel: string) => void;
 }
 
-export default function TasksList({ tasks, onMarkClick, onDeleteClick }: Props) {
+export default function TasksList({ tasks, onMarkClick, onDeleteClick, onUpdateTask }: Props) {
   return (
     <List>
       {tasks.map((task, index) => {
         return (
           <Fragment key={task.id}>
-            <Task task={task} indexInList={index} onMarkClick={onMarkClick} onDeleteClick={onDeleteClick} />
+            <Task
+              task={task}
+              indexInList={index}
+              onMarkClick={onMarkClick}
+              onDeleteClick={onDeleteClick}
+              onUpdate={onUpdateTask}
+            />
             <Divider />
           </Fragment>
         );

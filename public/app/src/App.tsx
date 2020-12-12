@@ -34,11 +34,20 @@ export default function App() {
     setDeleteConfirmOpen(true);
   }
 
+  function handleUpdateTask(task: ITask, newLabel: string) {
+    const action = TasksActions.updateTask({
+      taskId: task.id,
+      data: {
+        label: newLabel,
+      },
+    });
+    dispatch(action);
+  }
+
   function handleDeleteConfirm() {
     if (!taskForDelete.current) {
       return;
     }
-
     const taskId = taskForDelete.current.task.id;
     dispatch(TasksActions.deleteTask({ taskId: taskId }));
     setDeleteConfirmOpen(false);
@@ -61,8 +70,16 @@ export default function App() {
 
   return (
     <Box padding="20px">
+      <Typography variant="h2" component="h2" align="center">
+        Worldwide Todolist
+      </Typography>
       <Progress progress={state.progress} />
-      <TasksList tasks={state.tasks} onDeleteClick={handleDeleteClick} onMarkClick={handleMarkClick} />
+      <TasksList
+        tasks={state.tasks}
+        onDeleteClick={handleDeleteClick}
+        onMarkClick={handleMarkClick}
+        onUpdateTask={handleUpdateTask}
+      />
       <DeleteConfirm
         open={deleteConfirmOpen}
         onClose={() => setDeleteConfirmOpen(false)}

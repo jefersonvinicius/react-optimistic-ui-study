@@ -3,7 +3,7 @@ import DeleteConfirm from 'components/DeleteConfirm';
 import { render } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 
-describe('DeleteConfirm component testes', () => {
+describe.skip('DeleteConfirm component testes', () => {
   it('should show modal with default content', () => {
     act(() => {
       const { getByText } = render(<DeleteConfirm open={true} onClose={() => {}} onDelete={() => {}} />);
