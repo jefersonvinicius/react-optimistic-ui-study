@@ -1,4 +1,4 @@
-import tasksReducer, { IReducerTasksState, TasksActions } from 'reducers/tasks';
+import tasksReducer, { IReducerTasksState, TasksActions, SortTypes } from 'reducers/tasks';
 
 describe('Testing tasks reducer', () => {
   it('should init state', () => {
@@ -74,10 +74,8 @@ describe('Testing tasks reducer', () => {
       ],
       progress: 50,
     };
-
     const newTask = { id: 4, label: 'Teste 3', createdAt: '', updatedAt: '', completed: false };
     const state = tasksReducer(initialState, TasksActions.addTask({ newTask }));
-
     expect(state).toMatchObject({
       tasks: [
         { id: 2, label: 'Teste 2', createdAt: '', updatedAt: '', completed: true },
@@ -98,10 +96,8 @@ describe('Testing tasks reducer', () => {
       ],
       progress: 50,
     };
-
     const newTask = { id: 4, label: 'Teste 3', createdAt: '', updatedAt: '', completed: false };
     const state = tasksReducer(initialState, TasksActions.addTask({ newTask, index: 2 }));
-
     expect(state).toMatchObject({
       tasks: [
         { id: 2, label: 'Teste 2', createdAt: '', updatedAt: '', completed: true },
@@ -122,10 +118,8 @@ describe('Testing tasks reducer', () => {
       ],
       progress: 50,
     };
-
     const newTask = { id: 4, label: 'Teste 3', createdAt: '', updatedAt: '', completed: false };
     const state = tasksReducer(initialState, TasksActions.addTask({ newTask, index: 0 }));
-
     expect(state).toMatchObject({
       tasks: [
         { id: 4, label: 'Teste 3', createdAt: '', updatedAt: '', completed: false },
@@ -146,9 +140,7 @@ describe('Testing tasks reducer', () => {
       ],
       progress: 50,
     };
-
     const state = tasksReducer(initialState, TasksActions.updateTask({ taskId: 1, data: { label: 'Mudou' } }));
-
     expect(state).toMatchObject({
       tasks: [
         { id: 2, label: 'Teste 2', createdAt: '', updatedAt: '', completed: true },
@@ -168,9 +160,7 @@ describe('Testing tasks reducer', () => {
       ],
       progress: 50,
     };
-
     const state = tasksReducer(initialState, TasksActions.updateTask({ taskId: 5, data: { label: 'Mudou' } }));
-
     expect(state).toMatchObject(initialState);
   });
 
@@ -183,9 +173,7 @@ describe('Testing tasks reducer', () => {
       ],
       progress: 50,
     };
-
     const state = tasksReducer(initialState, TasksActions.updateTask({ taskId: 2, data: { label: 'Mudou' } }));
-
     expect(state).toMatchObject({
       tasks: [
         { id: 2, label: 'Mudou', createdAt: '', updatedAt: '', completed: true },
@@ -205,14 +193,56 @@ describe('Testing tasks reducer', () => {
       ],
       progress: 50,
     };
-
     const state = tasksReducer(initialState, TasksActions.updateTask({ taskId: 3, data: { label: 'Mudou' } }));
-
     expect(state).toMatchObject({
       tasks: [
         { id: 2, label: 'Teste 2', createdAt: '', updatedAt: '', completed: true },
         { id: 1, label: 'Teste', createdAt: '', updatedAt: '', completed: false },
         { id: 3, label: 'Mudou', createdAt: '', updatedAt: '', completed: true },
+      ],
+      progress: 50,
+    });
+  });
+
+  it('should sort task by completed', () => {
+    const initialState: IReducerTasksState = {
+      tasks: [
+        { id: 2, label: 'Teste 2', createdAt: '', updatedAt: '', completed: true },
+        { id: 1, label: 'Teste', createdAt: '', updatedAt: '', completed: false },
+        { id: 4, label: 'Teste', createdAt: '', updatedAt: '', completed: false },
+        { id: 3, label: 'Teste', createdAt: '', updatedAt: '', completed: true },
+      ],
+      progress: 50,
+    };
+    const state = tasksReducer(initialState, TasksActions.sortTasks({ by: SortTypes.byCompleted }));
+    expect(state).toMatchObject({
+      tasks: [
+        { id: 2, label: 'Teste 2', createdAt: '', updatedAt: '', completed: true },
+        { id: 3, label: 'Teste', createdAt: '', updatedAt: '', completed: true },
+        { id: 1, label: 'Teste', createdAt: '', updatedAt: '', completed: false },
+        { id: 4, label: 'Teste', createdAt: '', updatedAt: '', completed: false },
+      ],
+      progress: 50,
+    });
+  });
+
+  it('should sort task by not completed', () => {
+    const initialState: IReducerTasksState = {
+      tasks: [
+        { id: 2, label: 'Teste 2', createdAt: '', updatedAt: '', completed: true },
+        { id: 1, label: 'Teste', createdAt: '', updatedAt: '', completed: false },
+        { id: 4, label: 'Teste', createdAt: '', updatedAt: '', completed: false },
+        { id: 3, label: 'Teste', createdAt: '', updatedAt: '', completed: true },
+      ],
+      progress: 50,
+    };
+    const state = tasksReducer(initialState, TasksActions.sortTasks({ by: SortTypes.byNotCompleted }));
+    expect(state).toMatchObject({
+      tasks: [
+        { id: 1, label: 'Teste', createdAt: '', updatedAt: '', completed: false },
+        { id: 4, label: 'Teste', createdAt: '', updatedAt: '', completed: false },
+        { id: 2, label: 'Teste 2', createdAt: '', updatedAt: '', completed: true },
+        { id: 3, label: 'Teste', createdAt: '', updatedAt: '', completed: true },
       ],
       progress: 50,
     });

@@ -3,9 +3,12 @@
 -[ ] Adicionar tarefa
 -[x] Excluir tarefa
 -[x] Desfazer exclusão
--[ ] Atualizar tarefa
--[ ] Filtros
+-[x] Atualizar tarefa
+-[ ] Ordenar
   -[ ] Por concluídas
   -[ ] por não concluídas
-  -[ ] Por data
+  -[ ] Por mais novas
+  -[ ] Por mais antigas
+-[ ] Filtrar
+  -[ ] Por um intervalo de datas
 -[x] Barra de Progresso

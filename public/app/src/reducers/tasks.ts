@@ -12,6 +12,7 @@ enum TasksActionsTypes {
   DELETE_TASK = 'DELETE_TASK',
   ADD_TASK = 'ADD_TASK',
   UPDATE_TASK = 'UPDATE_TASK',
+  SORT_TASKS = 'SORT_TASKS',
 }
 
 interface IPayloadInitTasks {
@@ -41,9 +42,18 @@ interface IPayloadUpdateTask {
   data: IUpdateData;
 }
 
+export enum SortTypes {
+  byCompleted = 'completed',
+  byNotCompleted = 'not-completed',
+}
+
+interface IPayloadSortTasks {
+  by: SortTypes;
+}
+
 interface IReducerTasksAction {
   type: TasksActionsTypes;
-  payload: IPayloadInitTasks | IPayloadToggleTask | IPayloadDeleteTask | IPayloadAddTask;
+  payload: any;
 }
 
 export const initialState = { tasks: [], progress: 0 };
@@ -63,6 +73,9 @@ export const TasksActions = {
   },
   updateTask: (data: IPayloadUpdateTask): IReducerTasksAction => {
     return { type: TasksActionsTypes.UPDATE_TASK, payload: data };
+  },
+  sortTasks: (data: IPayloadSortTasks): IReducerTasksAction => {
+    return { type: TasksActionsTypes.SORT_TASKS, payload: data };
   },
 };
 
@@ -127,11 +140,53 @@ export default function tasksReducer(state: IReducerTasksState, action: IReducer
           ...state.tasks.slice(taskIndex + 1),
         ],
       };
+
+    case TasksActionsTypes.SORT_TASKS:
+      const sortType = (action.payload as IPayloadSortTasks).by;
+      if (sortType === SortTypes.byCompleted) {
+        return {
+          progress: state.progress,
+          tasks: sortTasksByCompleted(state.tasks),
+        };
+      }
+      if (sortType === SortTypes.byNotCompleted) {
+        return {
+          progress: state.progress,
+          tasks: sortTasksByNotCompleted(state.tasks),
+        };
+      }
+      return state;
     default:
       return state;
   }
 
   function shouldInsertInSpecificIndex(index: number | undefined) {
     return index !== undefined && index >= 0 && index <= state.tasks.length;
+  }
+
+  function sortTasksByCompleted(tasks: ITask[]) {
+    const tasksSorted = tasks.sort((taskA, taskB) => {
+      if (taskB.completed) {
+        return 1;
+      }
+      if (taskA.completed) {
+        return -1;
+      }
+      return 0;
+    });
+    return tasksSorted;
+  }
+
+  function sortTasksByNotCompleted(tasks: ITask[]) {
+    const tasksSorted = tasks.sort((taskA, taskB) => {
+      if (!taskB.completed) {
+        return 1;
+      }
+      if (!taskA.completed) {
+        return -1;
+      }
+      return 0;
+    });
+    return tasksSorted;
   }
 }
