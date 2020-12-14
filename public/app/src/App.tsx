@@ -1,22 +1,12 @@
-import {
-  Box,
-  Button,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  Radio,
-  RadioGroup,
-  Snackbar,
-  Typography,
-} from '@material-ui/core';
+import { Box, Button, Snackbar, Typography } from '@material-ui/core';
 import TasksList from 'components/TasksList';
-import React, { ChangeEvent, useEffect, useReducer, useRef, useState } from 'react';
+import React, { useEffect, useReducer, useRef, useState } from 'react';
 import api from './services/api';
 import { ITask } from './types';
 import Progress from 'components/Progress';
 import tasksReducer, { initialState, SortTypes, TasksActions } from 'reducers/tasks';
 import DeleteConfirm from 'components/DeleteConfirm';
-import { setSourceMapRange } from 'typescript';
+import SortSelection from 'components/SortSelection';
 
 interface ITaskForDelete {
   task: ITask;
@@ -25,7 +15,7 @@ interface ITaskForDelete {
 
 export default function App() {
   const [state, dispatch] = useReducer(tasksReducer, initialState);
-  const [currentSort, setCurrentSort] = useState<SortTypes | null>(null);
+  const [currentSort, setCurrentSort] = useState<SortTypes>(SortTypes.byNewers);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
@@ -80,8 +70,7 @@ export default function App() {
     taskForDelete.current = undefined;
   }
 
-  function handleSortChange(event: ChangeEvent<HTMLInputElement>) {
-    const sortType = event.target.value as SortTypes;
+  function handleSortChange(sortType: SortTypes) {
     setCurrentSort(sortType);
     dispatch(TasksActions.sortTasks({ by: sortType }));
   }
@@ -92,13 +81,7 @@ export default function App() {
         Worldwide Todolist
       </Typography>
       <Progress progress={state.progress} />
-      <FormControl>
-        <FormLabel>Label 1</FormLabel>
-        <RadioGroup value={currentSort} onChange={handleSortChange}>
-          <FormControlLabel value={SortTypes.byCompleted} control={<Radio />} label="completado" />
-          <FormControlLabel value={SortTypes.byNotCompleted} control={<Radio />} label="não completado" />
-        </RadioGroup>
-      </FormControl>
+      <SortSelection value={currentSort} onChange={handleSortChange} />
       <TasksList
         tasks={state.tasks}
         onDeleteClick={handleDeleteClick}

@@ -5,8 +5,8 @@
 -[x] Desfazer exclusão
 -[x] Atualizar tarefa
 -[ ] Ordenar
-  -[ ] Por concluídas
-  -[ ] por não concluídas
+  -[x] Por concluídas
+  -[x] por não concluídas
   -[ ] Por mais novas
   -[ ] Por mais antigas
 -[ ] Filtrar

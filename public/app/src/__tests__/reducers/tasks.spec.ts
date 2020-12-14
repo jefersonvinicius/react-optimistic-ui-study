@@ -247,4 +247,48 @@ describe('Testing tasks reducer', () => {
       progress: 50,
     });
   });
+
+  it('should sort task by newers', () => {
+    const initialState: IReducerTasksState = {
+      tasks: [
+        { id: 2, label: 'Teste 2', createdAt: '2020-11-19 23:10:11.952087+00', updatedAt: '', completed: true },
+        { id: 1, label: 'Teste', createdAt: '2020-11-11 23:10:11.952087+00', updatedAt: '', completed: false },
+        { id: 4, label: 'Teste', createdAt: '2020-11-19 22:10:11.952087+00', updatedAt: '', completed: false },
+        { id: 3, label: 'Teste', createdAt: '2020-11-23 23:10:11.952087+00', updatedAt: '', completed: true },
+      ],
+      progress: 50,
+    };
+    const state = tasksReducer(initialState, TasksActions.sortTasks({ by: SortTypes.byNewers }));
+    expect(state).toMatchObject({
+      tasks: [
+        { id: 3, label: 'Teste', createdAt: '2020-11-23 23:10:11.952087+00', updatedAt: '', completed: true },
+        { id: 2, label: 'Teste 2', createdAt: '2020-11-19 23:10:11.952087+00', updatedAt: '', completed: true },
+        { id: 4, label: 'Teste', createdAt: '2020-11-19 22:10:11.952087+00', updatedAt: '', completed: false },
+        { id: 1, label: 'Teste', createdAt: '2020-11-11 23:10:11.952087+00', updatedAt: '', completed: false },
+      ],
+      progress: 50,
+    });
+  });
+
+  it('should sort task by oldest', () => {
+    const initialState: IReducerTasksState = {
+      tasks: [
+        { id: 2, label: 'Teste 2', createdAt: '2020-11-19 23:10:11.952087+00', updatedAt: '', completed: true },
+        { id: 1, label: 'Teste', createdAt: '2020-11-11 23:10:11.952087+00', updatedAt: '', completed: false },
+        { id: 4, label: 'Teste', createdAt: '2020-11-19 22:10:11.952087+00', updatedAt: '', completed: false },
+        { id: 3, label: 'Teste', createdAt: '2020-11-23 23:10:11.952087+00', updatedAt: '', completed: true },
+      ],
+      progress: 50,
+    };
+    const state = tasksReducer(initialState, TasksActions.sortTasks({ by: SortTypes.byOldest }));
+    expect(state).toMatchObject({
+      tasks: [
+        { id: 1, label: 'Teste', createdAt: '2020-11-11 23:10:11.952087+00', updatedAt: '', completed: false },
+        { id: 4, label: 'Teste', createdAt: '2020-11-19 22:10:11.952087+00', updatedAt: '', completed: false },
+        { id: 2, label: 'Teste 2', createdAt: '2020-11-19 23:10:11.952087+00', updatedAt: '', completed: true },
+        { id: 3, label: 'Teste', createdAt: '2020-11-23 23:10:11.952087+00', updatedAt: '', completed: true },
+      ],
+      progress: 50,
+    });
+  });
 });

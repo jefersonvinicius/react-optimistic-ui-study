@@ -1,4 +1,5 @@
 import { calculateProgress } from 'common/progress';
+import { isAfter, isBefore } from 'date-fns';
 import { ITask } from 'types';
 
 export interface IReducerTasksState {
@@ -45,6 +46,8 @@ interface IPayloadUpdateTask {
 export enum SortTypes {
   byCompleted = 'completed',
   byNotCompleted = 'not-completed',
+  byNewers = 'newers',
+  byOldest = 'oldest',
 }
 
 interface IPayloadSortTasks {
@@ -155,6 +158,19 @@ export default function tasksReducer(state: IReducerTasksState, action: IReducer
           tasks: sortTasksByNotCompleted(state.tasks),
         };
       }
+      if (sortType === SortTypes.byNewers) {
+        return {
+          progress: state.progress,
+          tasks: sortTasksByNewers(state.tasks),
+        };
+      }
+      if (sortType === SortTypes.byOldest) {
+        return {
+          progress: state.progress,
+          tasks: sortTasksByOldest(state.tasks),
+        };
+      }
+
       return state;
     default:
       return state;
@@ -184,6 +200,36 @@ export default function tasksReducer(state: IReducerTasksState, action: IReducer
       }
       if (!taskA.completed) {
         return -1;
+      }
+      return 0;
+    });
+    return tasksSorted;
+  }
+
+  function sortTasksByNewers(tasks: ITask[]) {
+    const tasksSorted = tasks.sort((taskA, taskB) => {
+      const dateA = new Date(taskA.createdAt);
+      const dateB = new Date(taskB.createdAt);
+      if (isAfter(dateA, dateB)) {
+        return -1;
+      }
+      if (isAfter(dateB, dateA)) {
+        return 1;
+      }
+      return 0;
+    });
+    return tasksSorted;
+  }
+
+  function sortTasksByOldest(tasks: ITask[]) {
+    const tasksSorted = tasks.sort((taskA, taskB) => {
+      const dateA = new Date(taskA.createdAt);
+      const dateB = new Date(taskB.createdAt);
+      if (isBefore(dateA, dateB)) {
+        return -1;
+      }
+      if (isBefore(dateB, dateA)) {
+        return 1;
       }
       return 0;
     });
