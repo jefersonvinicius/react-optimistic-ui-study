@@ -1,5 +1,5 @@
 import { Divider, List } from '@material-ui/core';
-import React, { ForwardRefRenderFunction, Fragment, useImperativeHandle, useRef } from 'react';
+import React, { Fragment } from 'react';
 import { ITask } from 'types';
 import Task from './Task';
 
@@ -10,26 +10,9 @@ interface Props {
   onUpdateTask: (task: ITask, newLabel: string) => void;
 }
 
-interface Handle {
-  scrollToEnd: () => void;
-}
-
-const TasksList: ForwardRefRenderFunction<Handle, Props> = (
-  { tasks, onDeleteClick, onMarkClick, onUpdateTask },
-  ref
-) => {
-  const listRef = useRef<HTMLUListElement>(null);
-
-  useImperativeHandle(ref, () => {
-    return {
-      scrollToEnd: () => {
-        listRef.current?.scrollTo(0, document.body.scrollHeight);
-      },
-    };
-  });
-
+export default function TasksList({ tasks, onDeleteClick, onMarkClick, onUpdateTask }: Props) {
   return (
-    <List innerRef={listRef}>
+    <List>
       {tasks.map((task, index) => {
         return (
           <Fragment key={task.id}>
@@ -46,6 +29,4 @@ const TasksList: ForwardRefRenderFunction<Handle, Props> = (
       })}
     </List>
   );
-};
-
-export default React.forwardRef(TasksList);
+}

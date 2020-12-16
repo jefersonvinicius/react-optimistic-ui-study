@@ -15,8 +15,6 @@ interface ITaskForDelete {
   index: number;
 }
 
-type ListHandle = React.ElementRef<typeof TasksList>;
-
 export default function App() {
   const [state, dispatch] = useReducer(tasksReducer, initialState);
   const [currentSort, setCurrentSort] = useState<SortTypes>(SortTypes.byNewers);
@@ -25,7 +23,6 @@ export default function App() {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const listRef = useRef<ListHandle>(null);
   const taskForDelete = useRef<ITaskForDelete>();
 
   useEffect(() => {
@@ -74,7 +71,6 @@ export default function App() {
 
   function handleCloseSnackbar() {
     setSnackbarOpen(false);
-    taskForDelete.current = undefined;
   }
 
   function handleSortChange(sortType: SortTypes) {
@@ -96,18 +92,23 @@ export default function App() {
       updatedAt: Date.now().toString(),
     };
     dispatch(TasksActions.addTask({ newTask }));
-    // TODO :: FAZER SCROLL PARA FINAL DA LISTA DE TAREFAS
+    setTimeout(() => {
+      window.scrollTo({
+        behavior: 'smooth',
+        left: 0,
+        top: document.body.scrollHeight,
+      });
+    }, 500);
   }
 
   return (
-    <Box {...({ ref: containerRef } as any)} padding="20px" position="relative">
+    <Box {...({ ref: containerRef } as any)} padding="20px" position="relative" id="test">
       <Typography variant="h2" component="h2" align="center">
         Worldwide Todolist
       </Typography>
       <Progress progress={state.progress} />
       <SortSelection value={currentSort} onChange={handleSortChange} />
       <TasksList
-        ref={listRef}
         tasks={state.tasks}
         onDeleteClick={handleDeleteClick}
         onMarkClick={handleMarkClick}
