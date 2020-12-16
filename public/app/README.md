@@ -4,11 +4,9 @@
 -[x] Excluir tarefa
 -[x] Desfazer exclusão
 -[x] Atualizar tarefa
--[ ] Ordenar
+-[x] Ordenar
   -[x] Por concluídas
   -[x] por não concluídas
-  -[ ] Por mais novas
-  -[ ] Por mais antigas
--[ ] Filtrar
-  -[ ] Por um intervalo de datas
+  -[x] Por mais novas
+  -[x] Por mais antigas
 -[x] Barra de Progresso
