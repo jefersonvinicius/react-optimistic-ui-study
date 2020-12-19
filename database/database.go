@@ -2,7 +2,7 @@ package database
 
 import (
 	"log"
-	"todolist/domain/models"
+	"todolist/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

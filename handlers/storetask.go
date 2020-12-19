@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"todolist/database"
-	"todolist/domain/models"
+	"todolist/models"
 )
 
 // StorePayload store payload

@@ -1,10 +1,9 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
 	"todolist/database"
-	"todolist/domain/models"
+	"todolist/models"
 )
 
 // ListTasks : list tasks
@@ -21,7 +20,5 @@ func ListTasks(w http.ResponseWriter, r *http.Request) {
 		"progress": float64(numberOfTasksCompleted) / float64(len(tasks)) * 100,
 	}
 
-	json, _ := json.Marshal(data)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(json)
+	sendJSONResponse(w, data, http.StatusOK)
 }

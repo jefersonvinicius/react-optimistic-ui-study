@@ -2,7 +2,10 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
+
+	"gorm.io/gorm"
 )
 
 func sendJSONResponse(w http.ResponseWriter, data interface{}, status int) {
@@ -26,4 +29,21 @@ func decodeBodyToJSON(r *http.Request) (interface{}, error) {
 	err := decoder.Decode(&data)
 
 	return data, err
+}
+
+func checkTaskQueryResultAndSendResponseIfNecessary(result *gorm.DB, w http.ResponseWriter) bool {
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		response := map[string]string{
+			"message": "Tarefa não encontrada",
+		}
+		sendJSONResponse(w, response, http.StatusNotFound)
+		return true
+	} else if result.Error != nil {
+		response := map[string]string{
+			"message": result.Error.Error(),
+		}
+		sendJSONResponse(w, response, http.StatusInternalServerError)
+		return true
+	}
+	return false
 }
