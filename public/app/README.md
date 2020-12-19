@@ -1,6 +1,6 @@
 # Todo
 
--[ ] Adicionar tarefa
+-[x] Adicionar tarefa
 -[x] Excluir tarefa
 -[x] Desfazer exclusão
 -[x] Atualizar tarefa
@@ -10,3 +10,4 @@
   -[x] Por mais novas
   -[x] Por mais antigas
 -[x] Barra de Progresso
+-[ ] Mudar ordem da tarefa

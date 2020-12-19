@@ -16,8 +16,9 @@ func GetRouter() *mux.Router {
 
 // RegisterRoutes register routes
 func RegisterRoutes() {
-	router.HandleFunc("/tasks", handlers.ListTasks).Methods(http.MethodGet, http.MethodOptions)
-	router.HandleFunc("/tasks", handlers.StoreTask).Methods(http.MethodPost, http.MethodOptions)
+	router.HandleFunc("/tasks", handlers.ListTasks).Methods(http.MethodGet)
+	router.HandleFunc("/tasks", handlers.StoreTask).Methods(http.MethodPost)
+	router.HandleFunc("/tasks/{id}", handlers.DeleteTask).Methods(http.MethodDelete)
 
 	router.Use(mux.CORSMethodMiddleware(router))
 	router.Use(CorsAllowOriginMiddleware)
