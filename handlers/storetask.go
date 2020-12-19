@@ -1,20 +1,34 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"todolist/database"
 	"todolist/domain/models"
 )
 
-// StoreTask save task in database
-func StoreTask(w http.ResponseWriter, r *http.Request) {
-	task := models.Task{
-		Label: r.FormValue("task"),
-	}
-	database.Instance().Save(&task)
-	http.Redirect(w, r, "/", http.StatusPermanentRedirect)
+// StorePayload store payload
+type StorePayload struct {
+	Task string
 }
 
-func validateRequestData(r *http.Request) {
+// StoreTask save task in database
+func StoreTask(w http.ResponseWriter, r *http.Request) {
 
+	data, err := decodeBodyToJSON(r)
+	payload := data.(map[string]interface{})
+
+	if err != nil {
+		res := map[string]string{
+			"message": err.Error(),
+		}
+		sendJSONResponse(w, res, http.StatusInternalServerError)
+	}
+
+	fmt.Println(data)
+	task := models.Task{
+		Label: payload["task"].(string),
+	}
+	database.Instance().Save(&task)
+	sendJSONResponse(w, task, http.StatusCreated)
 }
