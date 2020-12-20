@@ -16,14 +16,13 @@ func GetRouter() *mux.Router {
 
 // RegisterRoutes register routes
 func RegisterRoutes() {
-	router.HandleFunc("/tasks", handlers.ListTasks).Methods(http.MethodGet)
-	router.HandleFunc("/tasks", handlers.StoreTask).Methods(http.MethodPost)
-	router.HandleFunc("/tasks/{id}", handlers.DeleteTask).Methods(http.MethodDelete)
-	router.HandleFunc("/tasks/{id}", handlers.UpdateTask).Methods(http.MethodPut)
-
 	router.Use(mux.CORSMethodMiddleware(router))
 	router.Use(CorsAllowOriginMiddleware)
 
+	router.HandleFunc("/tasks", handlers.ListTasks).Methods(http.MethodGet)
+	router.HandleFunc("/tasks", handlers.StoreTask).Methods(http.MethodPost, http.MethodOptions)
+	router.HandleFunc("/tasks/{id}", handlers.DeleteTask).Methods(http.MethodDelete, http.MethodOptions)
+	router.HandleFunc("/tasks/{id}", handlers.UpdateTask).Methods(http.MethodPut, http.MethodOptions)
 }
 
 // SetupStaticFilesServer to serve static files

@@ -10,6 +10,7 @@ import (
 
 func sendJSONResponse(w http.ResponseWriter, data interface{}, status int) {
 	if data == nil {
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(status)
 		w.Write([]byte(""))
 		return
