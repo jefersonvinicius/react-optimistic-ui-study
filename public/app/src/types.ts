@@ -4,4 +4,6 @@ export interface ITask {
   completed: boolean;
   createdAt: string;
   updatedAt: string;
+  saving?: boolean;
+  errorOnSave?: boolean;
 }

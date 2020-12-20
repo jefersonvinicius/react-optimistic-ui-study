@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer, useRef, useState } from 'react';
 import { Box, Button, Snackbar, Typography } from '@material-ui/core';
-import api from 'services/api';
+import api, { APIRequests } from 'services/api';
 import { ITask } from 'types';
 import tasksReducer, { initialState, SortTypes, TasksActions } from 'reducers/tasks';
 import Progress from 'components/Progress';
@@ -9,6 +9,9 @@ import DeleteConfirm from 'components/DeleteConfirm';
 import SortSelection from 'components/SortSelection';
 import AddButton from 'components/AddButton';
 import NewTask from 'components/NewTask';
+import { scrollToEndPageAfterTime } from 'common/dom';
+import { Alert } from '@material-ui/lab';
+import { createTask } from 'common/tasks';
 
 interface ITaskForDelete {
   task: ITask;
@@ -21,8 +24,11 @@ export default function App() {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [newTaskOpen, setNewTaskOpen] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarError, setSnackbarError] = useState({
+    open: false,
+    message: 'Ocorreu um erro!',
+  });
 
-  const containerRef = useRef<HTMLDivElement>(null);
   const taskForDelete = useRef<ITaskForDelete>();
 
   useEffect(() => {
@@ -30,6 +36,38 @@ export default function App() {
       dispatch(TasksActions.initTasks(response.data));
     });
   }, []);
+
+  function saveTaskOnServer(taskForSave: ITask) {
+    APIRequests.saveTask({ task: taskForSave.label })
+      .then((response) => {
+        const newTaskIndex = state.tasks.findIndex((task) => task.id === taskForSave.id);
+        dispatch(TasksActions.deleteTask({ taskId: taskForSave.id }));
+        dispatch(TasksActions.addTask({ newTask: response.data, index: newTaskIndex }));
+      })
+      .catch(() => {
+        const updateData = {
+          label: taskForSave.label,
+          errorOnSave: true,
+          saving: false,
+        };
+        const action = TasksActions.updateTask({ taskId: taskForSave.id, data: updateData });
+        dispatch(action);
+      });
+  }
+
+  function deleteTaskOnServer(taskForDelete: ITaskForDelete) {
+    APIRequests.deleteTask(taskForDelete.task.id).catch(() => {
+      const action = TasksActions.addTask({
+        newTask: taskForDelete.task,
+        index: taskForDelete.index,
+      });
+      dispatch(action);
+      setSnackbarError({
+        message: 'Erro ao deletar a tarefa!',
+        open: true,
+      });
+    });
+  }
 
   function handleMarkClick(_: ITask, index: number) {
     dispatch(TasksActions.toggleTask({ taskIndex: index }));
@@ -54,23 +92,46 @@ export default function App() {
     if (!taskForDelete.current) {
       return;
     }
+
     const taskId = taskForDelete.current.task.id;
     dispatch(TasksActions.deleteTask({ taskId: taskId }));
     setDeleteConfirmOpen(false);
     setSnackbarOpen(true);
+
+    if (shouldDeleteTaskOnServer()) {
+      const taskForDeleteHolder = taskForDelete.current;
+      deleteTaskOnServer(taskForDeleteHolder);
+    }
+
+    function shouldDeleteTaskOnServer() {
+      return taskId > 0;
+    }
   }
 
   function handleUndoDeleteClick() {
     if (!taskForDelete.current) {
       return;
     }
-    dispatch(TasksActions.addTask({ newTask: taskForDelete.current.task, index: taskForDelete.current.index }));
+
+    const action = TasksActions.addTask({
+      newTask: taskForDelete.current.task,
+      index: taskForDelete.current.index,
+    });
+    dispatch(action);
+
     taskForDelete.current = undefined;
     setSnackbarOpen(false);
   }
 
   function handleCloseSnackbar() {
     setSnackbarOpen(false);
+  }
+
+  function handleCloseSnackbarError() {
+    setSnackbarError({
+      ...snackbarError,
+      open: false,
+    });
   }
 
   function handleSortChange(sortType: SortTypes) {
@@ -84,25 +145,27 @@ export default function App() {
 
   function handleAddTask(taskLabel: string) {
     setNewTaskOpen(false);
-    const newTask: ITask = {
-      id: Date.now(),
-      label: taskLabel,
-      completed: false,
-      createdAt: Date.now().toString(),
-      updatedAt: Date.now().toString(),
-    };
+    const newTask = createTask(taskLabel);
     dispatch(TasksActions.addTask({ newTask }));
-    setTimeout(() => {
-      window.scrollTo({
-        behavior: 'smooth',
-        left: 0,
-        top: document.body.scrollHeight,
-      });
-    }, 500);
+    scrollToEndPageAfterTime();
+    saveTaskOnServer(newTask);
+  }
+
+  function handleSyncOnServer(task: ITask, _: number) {
+    console.log('SYNC: ', task);
+    if (task.id < 0) {
+      const updateData = {
+        label: task.label,
+        saving: true,
+        errorOnSave: false,
+      };
+      dispatch(TasksActions.updateTask({ taskId: task.id, data: updateData }));
+      saveTaskOnServer(task);
+    }
   }
 
   return (
-    <Box {...({ ref: containerRef } as any)} padding="20px" position="relative" id="test">
+    <Box padding="20px" position="relative" id="test">
       <Typography variant="h2" component="h2" align="center">
         Worldwide Todolist
       </Typography>
@@ -113,6 +176,7 @@ export default function App() {
         onDeleteClick={handleDeleteClick}
         onMarkClick={handleMarkClick}
         onUpdateTask={handleUpdateTask}
+        onSyncServer={handleSyncOnServer}
       />
       <DeleteConfirm
         open={deleteConfirmOpen}
@@ -130,8 +194,18 @@ export default function App() {
             Desfazer
           </Button>
         }
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
       />
+      <Snackbar
+        open={snackbarError.open}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbarError}
+        anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+      >
+        <Alert onClose={handleCloseSnackbarError} severity="error" variant="filled">
+          {snackbarError.message}
+        </Alert>
+      </Snackbar>
       <AddButton onClick={handleFABAddClick} />
     </Box>
   );

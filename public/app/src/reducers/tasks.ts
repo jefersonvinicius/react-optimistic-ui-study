@@ -36,6 +36,8 @@ interface IPayloadAddTask {
 
 interface IUpdateData {
   label: string;
+  saving?: boolean;
+  errorOnSave?: boolean;
 }
 
 interface IPayloadUpdateTask {
@@ -139,7 +141,7 @@ export default function tasksReducer(state: IReducerTasksState, action: IReducer
         progress: state.progress,
         tasks: [
           ...state.tasks.slice(0, taskIndex),
-          { ...taskPreviousData, label: data.label },
+          { ...taskPreviousData, ...data },
           ...state.tasks.slice(taskIndex + 1),
         ],
       };

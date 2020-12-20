@@ -1,5 +1,6 @@
-import { Box, Fade, IconButton, ListItem, ListItemText, TextField } from '@material-ui/core';
 import React, { ChangeEvent, useState, FocusEvent, KeyboardEvent, useEffect } from 'react';
+import { Box, CircularProgress, Fade, IconButton, ListItem, ListItemText, TextField, Tooltip } from '@material-ui/core';
+import WarningRoundedIcon from '@material-ui/icons/WarningRounded';
 import { ITask } from 'types';
 import DeleteIcon from '@material-ui/icons/Delete';
 import CheckIcon from '@material-ui/icons/Check';
@@ -10,12 +11,14 @@ interface Props {
   onDeleteClick: (task: ITask, index: number) => void;
   onMarkClick: (task: ITask, index: number) => void;
   onUpdate: (task: ITask, newLabel: string) => void;
+  onSyncServer: (task: ITask, index: number) => void;
 }
 
-export default function Task({ task, indexInList, onDeleteClick, onMarkClick, onUpdate }: Props) {
+export default function Task({ task, indexInList, onDeleteClick, onMarkClick, onUpdate, onSyncServer }: Props) {
   const [label, setLabel] = useState(task.label);
   const [inputEnabled, setInputEnabled] = useState(false);
   const [animate, setAnimate] = useState(false);
+  const [errorTooltip, setErrorTooltip] = useState(false);
 
   useEffect(() => {
     setAnimate(true);
@@ -47,6 +50,14 @@ export default function Task({ task, indexInList, onDeleteClick, onMarkClick, on
     }
   }
 
+  function openErrorTooltip() {
+    setErrorTooltip(true);
+  }
+
+  function closeErrorTooltip() {
+    setErrorTooltip(false);
+  }
+
   return (
     <Fade in={animate} timeout={1000}>
       <div>
@@ -75,6 +86,20 @@ export default function Task({ task, indexInList, onDeleteClick, onMarkClick, on
               </ListItemText>
             )}
           </Box>
+          {task.saving && <CircularProgress size={20} />}
+          {task.errorOnSave && (
+            <Tooltip title="Erro ao sincronizar no servidor! Clique para tentar novamente." open={errorTooltip}>
+              <IconButton
+                onMouseEnter={openErrorTooltip}
+                onMouseLeave={closeErrorTooltip}
+                onClick={() => {
+                  onSyncServer(task, indexInList);
+                }}
+              >
+                <WarningRoundedIcon />
+              </IconButton>
+            </Tooltip>
+          )}
         </ListItem>
       </div>
     </Fade>
