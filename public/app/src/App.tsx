@@ -1,7 +1,7 @@
 import React, { useEffect, useReducer, useRef, useState } from 'react';
 import { Box, Button, Snackbar, Typography } from '@material-ui/core';
 import api, { APIRequests } from 'services/api';
-import { ITask } from 'types';
+import { IAPISaveTask, IAPIUpdateTask, ITask } from 'types';
 import tasksReducer, { initialState, SortTypes, TasksActions } from 'reducers/tasks';
 import Progress from 'components/Progress';
 import TasksList from 'components/TasksList';
@@ -38,7 +38,7 @@ export default function App() {
   }, []);
 
   function saveTaskOnServer(taskForSave: ITask) {
-    APIRequests.saveTask({ task: taskForSave.label })
+    APIRequests.saveTask({ label: taskForSave.label })
       .then((response) => {
         const newTaskIndex = state.tasks.findIndex((task) => task.id === taskForSave.id);
         dispatch(TasksActions.deleteTask({ taskId: taskForSave.id }));
@@ -69,8 +69,79 @@ export default function App() {
     });
   }
 
-  function handleMarkClick(_: ITask, index: number) {
+  function updateTaskOnServer(taskId: number, data: IAPIUpdateTask) {
+    APIRequests.updateTask(taskId, data)
+      .then(() => {
+        const action = TasksActions.updateTask({
+          taskId: taskId,
+          data: {
+            label: data.label,
+            errorOnSave: false,
+            saving: false,
+          },
+        });
+        dispatch(action);
+      })
+      .catch(() => {
+        const action = TasksActions.updateTask({
+          taskId: taskId,
+          data: {
+            label: data.label,
+            errorOnSave: true,
+            saving: false,
+          },
+        });
+        dispatch(action);
+      });
+  }
+
+  function toggleTaskOnServer(taskId: number, data: IAPIUpdateTask) {
+    APIRequests.updateTask(taskId, data)
+      .then(() => {
+        const action = TasksActions.updateTask({
+          taskId: taskId,
+          data: {
+            label: data.label,
+            errorOnSave: false,
+            saving: false,
+          },
+        });
+        dispatch(action);
+      })
+      .catch(() => {
+        const action = TasksActions.updateTask({
+          taskId: taskId,
+          data: {
+            label: data.label,
+            errorOnSave: true,
+            saving: false,
+          },
+        });
+        dispatch(action);
+      });
+  }
+
+  function handleMarkClick(task: ITask, index: number) {
     dispatch(TasksActions.toggleTask({ taskIndex: index }));
+
+    const shouldToggleTaskOnServer = task.id > 0;
+
+    if (shouldToggleTaskOnServer) {
+      const updateAction = TasksActions.updateTask({
+        taskId: task.id,
+        data: {
+          label: task.label,
+          errorOnSave: false,
+          saving: true,
+        },
+      });
+      dispatch(updateAction);
+
+      toggleTaskOnServer(task.id, {
+        completed: !task.completed,
+        label: task.label,
+      });
+    }
   }
 
   function handleDeleteClick(task: ITask, index: number) {
@@ -79,13 +150,25 @@ export default function App() {
   }
 
   function handleUpdateTask(task: ITask, newLabel: string) {
+    const shouldUpdateOnServer = task.id > 0;
+
     const action = TasksActions.updateTask({
       taskId: task.id,
       data: {
         label: newLabel,
+        errorOnSave: false,
+        saving: shouldUpdateOnServer ? true : false,
       },
     });
     dispatch(action);
+
+    if (shouldUpdateOnServer) {
+      const data: IAPIUpdateTask = {
+        label: newLabel,
+        completed: task.completed,
+      };
+      updateTaskOnServer(task.id, data);
+    }
   }
 
   function handleDeleteConfirm() {
@@ -152,8 +235,8 @@ export default function App() {
   }
 
   function handleSyncOnServer(task: ITask, _: number) {
-    console.log('SYNC: ', task);
-    if (task.id < 0) {
+    const needSaveOnServer = task.id < 0;
+    if (needSaveOnServer) {
       const updateData = {
         label: task.label,
         saving: true,
@@ -161,6 +244,19 @@ export default function App() {
       };
       dispatch(TasksActions.updateTask({ taskId: task.id, data: updateData }));
       saveTaskOnServer(task);
+    } else {
+      const updateData = {
+        label: task.label,
+        saving: true,
+        errorOnSave: false,
+      };
+      dispatch(TasksActions.updateTask({ taskId: task.id, data: updateData }));
+
+      const updateDataOnServer: IAPIUpdateTask = {
+        label: task.label,
+        completed: task.completed,
+      };
+      updateTaskOnServer(task.id, updateDataOnServer);
     }
   }
 

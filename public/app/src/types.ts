@@ -7,3 +7,12 @@ export interface ITask {
   saving?: boolean;
   errorOnSave?: boolean;
 }
+
+export interface IAPISaveTask {
+  label: string;
+}
+
+export interface IAPIUpdateTask {
+  label: string;
+  completed: boolean;
+}
