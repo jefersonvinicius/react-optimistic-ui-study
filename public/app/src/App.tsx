@@ -1,7 +1,7 @@
 import React, { useEffect, useReducer, useRef, useState } from 'react';
 import { Box, Button, Snackbar, Typography } from '@material-ui/core';
 import api, { APIRequests } from 'services/api';
-import { IAPISaveTask, IAPIUpdateTask, ITask } from 'types';
+import { IAPIUpdateTask, ITask } from 'types';
 import tasksReducer, { initialState, SortTypes, TasksActions } from 'reducers/tasks';
 import Progress from 'components/Progress';
 import TasksList from 'components/TasksList';
@@ -12,6 +12,9 @@ import NewTask from 'components/NewTask';
 import { scrollToEndPageAfterTime } from 'common/dom';
 import { Alert } from '@material-ui/lab';
 import { createTask } from 'common/tasks';
+
+// Improve code:
+// Create 'syncWithSuccess'
 
 interface ITaskForDelete {
   task: ITask;

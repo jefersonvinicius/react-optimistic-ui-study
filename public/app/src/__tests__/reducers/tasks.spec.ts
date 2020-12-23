@@ -291,4 +291,48 @@ describe('Testing tasks reducer', () => {
       progress: 50,
     });
   });
+
+  it('should change task to syncing state', () => {
+    const initialState: IReducerTasksState = {
+      tasks: [
+        { id: 2, label: 'Teste 2', createdAt: '', updatedAt: '', completed: true, saving: false, errorOnSave: false },
+        { id: 1, label: 'Teste', createdAt: '', updatedAt: '', completed: false, saving: false, errorOnSave: false },
+        { id: 4, label: 'Teste', createdAt: '', updatedAt: '', completed: false, saving: false, errorOnSave: false },
+        { id: 3, label: 'Teste', createdAt: '', updatedAt: '', completed: true, saving: false, errorOnSave: false },
+      ],
+      progress: 50,
+    };
+    const state = tasksReducer(initialState, TasksActions.syncOnServer({ taskId: 1 }));
+    expect(state).toMatchObject({
+      tasks: [
+        { id: 2, label: 'Teste 2', createdAt: '', updatedAt: '', completed: true, saving: false, errorOnSave: false },
+        { id: 1, label: 'Teste', createdAt: '', updatedAt: '', completed: false, saving: true, errorOnSave: false },
+        { id: 4, label: 'Teste', createdAt: '', updatedAt: '', completed: false, saving: false, errorOnSave: false },
+        { id: 3, label: 'Teste', createdAt: '', updatedAt: '', completed: true, saving: false, errorOnSave: false },
+      ],
+      progress: 50,
+    });
+  });
+
+  it('should change task to sync error state', () => {
+    const initialState: IReducerTasksState = {
+      tasks: [
+        { id: 2, label: 'Teste 2', createdAt: '', updatedAt: '', completed: true, saving: false, errorOnSave: false },
+        { id: 1, label: 'Teste', createdAt: '', updatedAt: '', completed: false, saving: false, errorOnSave: false },
+        { id: 4, label: 'Teste', createdAt: '', updatedAt: '', completed: false, saving: false, errorOnSave: false },
+        { id: 3, label: 'Teste', createdAt: '', updatedAt: '', completed: true, saving: false, errorOnSave: false },
+      ],
+      progress: 50,
+    };
+    const state = tasksReducer(initialState, TasksActions.syncWithError({ taskId: 1 }));
+    expect(state).toMatchObject({
+      tasks: [
+        { id: 2, label: 'Teste 2', createdAt: '', updatedAt: '', completed: true, saving: false, errorOnSave: false },
+        { id: 1, label: 'Teste', createdAt: '', updatedAt: '', completed: false, saving: false, errorOnSave: true },
+        { id: 4, label: 'Teste', createdAt: '', updatedAt: '', completed: false, saving: false, errorOnSave: false },
+        { id: 3, label: 'Teste', createdAt: '', updatedAt: '', completed: true, saving: false, errorOnSave: false },
+      ],
+      progress: 50,
+    });
+  });
 });

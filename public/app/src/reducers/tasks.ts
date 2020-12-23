@@ -14,6 +14,8 @@ enum TasksActionsTypes {
   ADD_TASK = 'ADD_TASK',
   UPDATE_TASK = 'UPDATE_TASK',
   SORT_TASKS = 'SORT_TASKS',
+  SYNC_ON_SERVER = 'SYNC_ON_SERVER',
+  SYNC_WITH_ERROR = 'SYNC_WITH_ERROR',
 }
 
 interface IPayloadInitTasks {
@@ -61,6 +63,14 @@ interface IReducerTasksAction {
   payload: any;
 }
 
+interface IPayloadSyncOnServer {
+  taskId: number;
+}
+
+interface IPayloadSyncWithError {
+  taskId: number;
+}
+
 export const initialState = { tasks: [], progress: 0 };
 
 export const TasksActions = {
@@ -81,6 +91,12 @@ export const TasksActions = {
   },
   sortTasks: (data: IPayloadSortTasks): IReducerTasksAction => {
     return { type: TasksActionsTypes.SORT_TASKS, payload: data };
+  },
+  syncOnServer: (data: IPayloadSyncOnServer): IReducerTasksAction => {
+    return { type: TasksActionsTypes.SYNC_ON_SERVER, payload: data };
+  },
+  syncWithError: (data: IPayloadSyncWithError): IReducerTasksAction => {
+    return { type: TasksActionsTypes.SYNC_WITH_ERROR, payload: data };
   },
 };
 
@@ -174,6 +190,34 @@ export default function tasksReducer(state: IReducerTasksState, action: IReducer
       }
 
       return state;
+
+    case TasksActionsTypes.SYNC_ON_SERVER:
+      const taskIdForSync = (action.payload as IPayloadSyncOnServer).taskId;
+      const taskIndexForSync = state.tasks.findIndex((task) => task.id === taskIdForSync);
+
+      const taskForSyncPreviousData = state.tasks[taskIndexForSync];
+      return {
+        progress: state.progress,
+        tasks: [
+          ...state.tasks.slice(0, taskIndexForSync),
+          { ...taskForSyncPreviousData, saving: true, errorOnSave: false },
+          ...state.tasks.slice(taskIndexForSync + 1),
+        ],
+      };
+
+    case TasksActionsTypes.SYNC_WITH_ERROR:
+      const taskIdWithError = (action.payload as IPayloadSyncOnServer).taskId;
+      const taskIndexWithError = state.tasks.findIndex((task) => task.id === taskIdWithError);
+
+      const taskWithErrorPreviousData = state.tasks[taskIndexWithError];
+      return {
+        progress: state.progress,
+        tasks: [
+          ...state.tasks.slice(0, taskIndexWithError),
+          { ...taskWithErrorPreviousData, saving: false, errorOnSave: true },
+          ...state.tasks.slice(taskIndexWithError + 1),
+        ],
+      };
     default:
       return state;
   }
