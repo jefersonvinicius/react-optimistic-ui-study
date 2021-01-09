@@ -36,5 +36,4 @@ func UpdateTask(w http.ResponseWriter, r *http.Request) {
 	database.Instance().Save(&task)
 
 	sendJSONResponse(w, task, http.StatusOK)
-
 }
