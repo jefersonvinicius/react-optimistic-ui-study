@@ -1,9 +1,7 @@
-Repositório de Estudo
-
----
+# :books: Repositório de Estudo :books:
 
 ## O que foi realizado?
-Uma aplicação em React ```(/public/app)``` para estudar como implementar uma Optimistic UI e além praticar um pouco de TDD no lado do frontend. Uma simples API em Golang foi feita para auxiliar o frontend
+Uma aplicação em React para estudar como implementar uma Optimistic UI e além de praticar um pouco de TDD no lado do frontend. Uma simples API em Golang foi feita para auxiliar o frontend
 
 ## Bibliotecas utilizadas
 ### frontend:
