@@ -11,3 +11,19 @@ Uma aplicação em React para estudar como implementar uma Optimistic UI e além
 ### backend:
     - https://github.com/gorilla/mux
     - https://gorm.io/index.html
+
+## Como executar o projeto?
+### frontend
+```
+cd web/app
+npm install
+npm start
+```
+
+### backend
+```
+cd .docker
+docker-composer up
+cd ../server
+go run main.go
+```
